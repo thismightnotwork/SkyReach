@@ -3,22 +3,21 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SkyReach — Virtual Airline (Rebuild)</title>
+  <title>SkyReach — Virtual Airline (SPA single file)</title>
 
-  <!-- Tailwind CDN (allowed) -->
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Tailwind config: set custom colors & font-family via inline style -->
+  <!-- Basic theme variables & small custom CSS -->
   <style>
     :root{
-      --sr-blue: #0f4e9c;      /* deep blue */
-      --sr-blue-600: #1e63c8;  /* accent / CTA */
+      --sr-blue: #0f4e9c;
+      --sr-blue-600: #1e63c8;
       --sr-gray-100: #f7fafc;
       --sr-muted: #6b7280;
-      --sr-accent: #ffb020;    /* warm accent */
+      --sr-accent: #ffb020;
     }
 
-    /* Use Tailwind's utility classes, but add a few small custom rules */
     html,body,#app { height: 100%; }
     body {
       font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
@@ -26,42 +25,18 @@
       color: #0f172a;
     }
 
-    /* subtle glass for hero overlay */
-    .glass {
-      background: rgba(255,255,255,0.6);
-      backdrop-filter: blur(6px);
-    }
-
-    /* Animated expand/collapse for service descriptions */
-    .collapsible {
-      transition: max-height 320ms cubic-bezier(.2,.8,.2,1), opacity 220ms;
-      overflow: hidden;
-      opacity: 1;
-    }
-
-    .collapsible.collapsed {
-      max-height: 0;
-      opacity: 0;
-    }
-
-    /* focus ring for accessibility */
-    .focus-ring:focus {
-      outline: 3px solid rgba(30,99,200,0.22);
-      outline-offset: 2px;
-    }
-
-    /* Lightbox modal base */
-    .modal-backdrop {
-      background: rgba(2,6,23,0.6);
-      backdrop-filter: blur(2px);
-    }
-
-    /* subtle scrollbar styling (non-critical) */
-    ::-webkit-scrollbar { height: 12px; width: 10px; }
-    ::-webkit-scrollbar-thumb { background: rgba(15,78,156,0.12); border-radius: 8px; }
+    .glass { background: rgba(255,255,255,0.6); backdrop-filter: blur(6px); }
+    .collapsible { transition: max-height 320ms cubic-bezier(.2,.8,.2,1), opacity 220ms; overflow: hidden; opacity:1; }
+    .collapsible.collapsed { max-height:0; opacity:0; }
+    .focus-ring:focus { outline: 3px solid rgba(30,99,200,0.22); outline-offset:2px; }
+    .modal-backdrop { background: rgba(2,6,23,0.6); backdrop-filter: blur(2px); }
+    ::-webkit-scrollbar { height: 12px; width: 10px; } ::-webkit-scrollbar-thumb { background: rgba(15,78,156,0.12); border-radius:8px; }
+    /* Small helper to show/hide "pages" */
+    .page { display: none; }
+    .page.active { display: block; }
   </style>
 
-  <meta name="description" content="SkyReach Virtual Airline — connecting you through the skies. Rebuilt single-page site." />
+  <meta name="description" content="SkyReach Virtual Airline — unified single-file site with members area and gallery." />
 </head>
 <body class="antialiased text-slate-900" id="app">
 
@@ -70,12 +45,12 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <nav class="flex items-center justify-between h-16">
         <div class="flex items-center space-x-3">
-          <a href="#home" class="flex items-center gap-3">
+          <!-- Clickable logo goes to top/home -->
+          <a href="#home" class="flex items-center gap-3" data-link>
             <div class="h-9 w-9 rounded-full overflow-hidden flex items-center justify-center bg-[var(--sr-blue)] text-white font-bold">
-  <img src="images/logo.png" alt="SkyReach Logo" class="h-full w-full object-cover" onerror="this.style.display='none'">
-  <span class="sr-only">SkyReach</span>
-</div>
-
+              <img src="images/logo.png" alt="SkyReach Logo" class="h-full w-full object-cover" onerror="this.style.display='none'">
+              <span class="sr-only">SkyReach</span>
+            </div>
             <div class="hidden sm:block">
               <span class="font-semibold text-lg tracking-tight">SkyReach</span>
               <div class="text-xs text-slate-500 -mt-0.5">Virtual Airline</div>
@@ -84,16 +59,20 @@
         </div>
 
         <div class="hidden md:flex items-center space-x-6">
-          <a class="nav-link text-slate-700 hover:text-slate-900 py-2 px-1" href="#home">Home</a>
-          <a class="nav-link text-slate-700 hover:text-slate-900 py-2 px-1" href="#about">About</a>
-          <a class="nav-link text-slate-700 hover:text-slate-900 py-2 px-1" href="#services">Services</a>
-          <a class="nav-link text-slate-700 hover:text-slate-900 py-2 px-1" href="#why-choose-us">Why Choose Us</a>
-          <a class="nav-link text-slate-700 hover:text-slate-900 py-2 px-1" href="#gallery">Gallery</a>
-          <a class="nav-link text-slate-700 hover:text-slate-900 py-2 px-1" href="#contact">Contact</a>
+          <a class="nav-link text-slate-700 hover:text-slate-900 py-2 px-1" href="#home" data-link>Home</a>
+          <a class="nav-link text-slate-700 hover:text-slate-900 py-2 px-1" href="#about" data-link>About</a>
+          <a class="nav-link text-slate-700 hover:text-slate-900 py-2 px-1" href="#services" data-link>Services</a>
+          <a class="nav-link text-slate-700 hover:text-slate-900 py-2 px-1" href="#why-choose-us" data-link>Why Choose Us</a>
+          <a class="nav-link text-slate-700 hover:text-slate-900 py-2 px-1" href="#gallery" data-link>Gallery</a>
+          <a class="nav-link text-slate-700 hover:text-slate-900 py-2 px-1" href="#contact" data-link>Contact</a>
         </div>
 
         <div class="flex items-center gap-3">
-          <a href="#contact" class="hidden sm:inline-block rounded-md px-4 py-2 text-sm font-medium focus-ring" style="background:var(--sr-blue-600);color:white">Contact Us</a>
+          <a href="#contact" class="hidden sm:inline-block rounded-md px-4 py-2 text-sm font-medium focus-ring" style="background:var(--sr-blue-600);color:white" data-link>Contact Us</a>
+
+          <!-- Member links -->
+          <button id="navLoginBtn" class="text-sm px-3 py-1 border rounded hover:bg-slate-50 hidden md:inline-block">Login</button>
+          <button id="navSignupBtn" class="text-sm px-3 py-1 bg-accent text-white rounded hidden md:inline-block">Sign up</button>
 
           <!-- Mobile menu button -->
           <button id="navToggle" class="md:hidden p-2 rounded-md focus-ring" aria-label="Open menu">
@@ -107,20 +86,25 @@
     <!-- Mobile nav -->
     <div id="mobileNav" class="md:hidden hidden border-t border-slate-100">
       <div class="px-4 pb-4 space-y-2">
-        <a class="block nav-link py-2" href="#home">Home</a>
-        <a class="block nav-link py-2" href="#about">About</a>
-        <a class="block nav-link py-2" href="#services">Services</a>
-        <a class="block nav-link py-2" href="#why-choose-us">Why Choose Us</a>
-        <a class="block nav-link py-2" href="#gallery">Gallery</a>
-        <a class="block nav-link py-2" href="#contact">Contact</a>
+        <a class="block nav-link py-2" href="#home" data-link>Home</a>
+        <a class="block nav-link py-2" href="#about" data-link>About</a>
+        <a class="block nav-link py-2" href="#services" data-link>Services</a>
+        <a class="block nav-link py-2" href="#why-choose-us" data-link>Why Choose Us</a>
+        <a class="block nav-link py-2" href="#gallery" data-link>Gallery</a>
+        <a class="block nav-link py-2" href="#contact" data-link>Contact</a>
+        <div class="pt-2 border-t mt-2">
+          <button class="w-full text-left py-2" id="mobileLoginBtn">Login</button>
+          <button class="w-full text-left py-2" id="mobileSignupBtn">Sign up</button>
+        </div>
       </div>
     </div>
   </header>
 
+  <!-- MAIN: all "pages" are sections inside the single page. We show/hide using JS routing. -->
   <main class="pt-20">
 
-    <!-- HERO / HOME -->
-    <section id="home" class="min-h-[60vh] flex items-center">
+    <!-- HOME (default) -->
+    <section id="home" class="page active min-h-[60vh] flex items-center">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           <div class="py-12">
@@ -128,12 +112,13 @@
             <p class="mt-4 text-slate-600 max-w-xl">Connecting you through the skies. We bring a realistic, community-first virtual airline experience to flight sim pilots across the UK and beyond.</p>
 
             <div class="mt-6 flex flex-wrap gap-3">
-              <a href="#services" class="inline-flex items-center gap-2 px-5 py-3 rounded-md shadow-sm text-sm font-semibold" style="background:var(--sr-blue-600); color:white">Our Services</a>
-              <a href="#contact" class="inline-flex items-center gap-2 px-5 py-3 rounded-md text-sm font-semibold border border-slate-200">Contact Us</a>
+              <a href="#services" class="inline-flex items-center gap-2 px-5 py-3 rounded-md shadow-sm text-sm font-semibold" style="background:var(--sr-blue-600); color:white" data-link>Our Services</a>
+              <a href="#contact" class="inline-flex items-center gap-2 px-5 py-3 rounded-md text-sm font-semibold border border-slate-200" data-link>Contact Us</a>
+              <button id="heroLogin" class="inline-flex items-center gap-2 px-5 py-3 rounded-md text-sm font-semibold border border-slate-200">Members area</button>
             </div>
 
             <div class="mt-8 text-sm text-slate-500">
-              <strong>Members:</strong> <a href="#" class="text-slate-700 underline">Login to Members Area</a>
+              <strong>Hubs:</strong> MAN • LTN • LGW • EDI
             </div>
           </div>
 
@@ -148,7 +133,7 @@
     </section>
 
     <!-- ABOUT -->
-    <section id="about" class="py-16 bg-white">
+    <section id="about" class="page py-16 bg-white">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           <div class="lg:col-span-2">
@@ -197,14 +182,14 @@
               <div><span class="font-medium">ICAO</span>: SRH</div>
               <div><span class="font-medium">Hubs</span>: MAN, LTN, LGW, EDI</div>
             </dl>
-            <div class="mt-4"><a href="#contact" class="inline-block text-sm px-3 py-2 border rounded-md">Get in touch</a></div>
+            <div class="mt-4"><a href="#contact" class="inline-block text-sm px-3 py-2 border rounded-md" data-link>Get in touch</a></div>
           </aside>
         </div>
       </div>
     </section>
 
     <!-- SERVICES -->
-    <section id="services" class="py-16">
+    <section id="services" class="page py-16">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between">
           <h2 class="text-2xl font-semibold">Our Services</h2>
@@ -212,26 +197,18 @@
         </div>
 
         <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Service card template repeated -->
+          <!-- Service cards (collapsed sections) -->
           <article class="rounded-lg border p-4">
             <div class="flex items-start gap-4">
               <img class="w-24 h-16 object-cover rounded" src="https://placehold.co/600x400/1e63c8/ffffff?text=A320+Ops" alt="A320 operations placeholder">
               <div class="flex-1">
                 <h3 class="font-semibold">Fleet Ops & Route Network</h3>
                 <p class="mt-1 text-sm text-slate-500">Structured routes across our hubs and network.</p>
-
-                <!-- Collapsible description -->
                 <div class="mt-3">
                   <div class="collapsible collapsed" data-id="svc-1" style="max-height:0">
-                    <p class="text-sm text-slate-600">
-                      We maintain a curated network of routes optimised for our fleet mix — A320neo, Embraer E190, ATR72/42.
-                      Members get access to preferred routes, recommended procedures and event routes for community fly-ins.
-                    </p>
+                    <p class="text-sm text-slate-600">We maintain a curated network of routes optimised for our fleet mix — A320neo, Embraer E190, ATR72/42. Members get access to preferred routes, recommended procedures and event routes for community fly-ins.</p>
                   </div>
-
-                  <button class="mt-3 text-sm font-medium toggle-btn" data-target="svc-1" aria-expanded="false">
-                    Read more
-                  </button>
+                  <button class="mt-3 text-sm font-medium toggle-btn" data-target="svc-1" aria-expanded="false">Read more</button>
                 </div>
               </div>
             </div>
@@ -243,15 +220,10 @@
               <div class="flex-1">
                 <h3 class="font-semibold">Pilot Training & Mentoring</h3>
                 <p class="mt-1 text-sm text-slate-500">Structured mentoring and training programs.</p>
-
                 <div class="mt-3">
                   <div class="collapsible collapsed" data-id="svc-2" style="max-height:0">
-                    <p class="text-sm text-slate-600">
-                      We provide mentoring, procedural training, and event coaching to help pilots improve technique,
-                      learn realistic approaches (including ILS procedures) and become active community members.
-                    </p>
+                    <p class="text-sm text-slate-600">We provide mentoring, procedural training, and event coaching to help pilots improve technique, learn realistic approaches (including ILS procedures) and become active community members.</p>
                   </div>
-
                   <button class="mt-3 text-sm font-medium toggle-btn" data-target="svc-2" aria-expanded="false">Read more</button>
                 </div>
               </div>
@@ -264,15 +236,10 @@
               <div class="flex-1">
                 <h3 class="font-semibold">Community Events</h3>
                 <p class="mt-1 text-sm text-slate-500">Regular fly-ins, group flights and competitions.</p>
-
                 <div class="mt-3">
                   <div class="collapsible collapsed" data-id="svc-3" style="max-height:0">
-                    <p class="text-sm text-slate-600">
-                      Our events calendar features weekly group flights, seasonal events and challenges. Staff-led events
-                      include briefings, route packs and ATC coordination where possible.
-                    </p>
+                    <p class="text-sm text-slate-600">Our events calendar features weekly group flights, seasonal events and challenges. Staff-led events include briefings, route packs and ATC coordination where possible.</p>
                   </div>
-
                   <button class="mt-3 text-sm font-medium toggle-btn" data-target="svc-3" aria-expanded="false">Read more</button>
                 </div>
               </div>
@@ -285,15 +252,10 @@
               <div class="flex-1">
                 <h3 class="font-semibold">Guides & Resources</h3>
                 <p class="mt-1 text-sm text-slate-500">Checklists, how-tos and pilot resources.</p>
-
                 <div class="mt-3">
                   <div class="collapsible collapsed" data-id="svc-4" style="max-height:0">
-                    <p class="text-sm text-slate-600">
-                      Downloadable guides, recommended procedure notes and checklists to support safe and realistic operations.
-                      Content is optimised for popular aircraft used by members.
-                    </p>
+                    <p class="text-sm text-slate-600">Downloadable guides, recommended procedure notes and checklists to support safe and realistic operations. Content is optimised for popular aircraft used by members.</p>
                   </div>
-
                   <button class="mt-3 text-sm font-medium toggle-btn" data-target="svc-4" aria-expanded="false">Read more</button>
                 </div>
               </div>
@@ -304,7 +266,7 @@
     </section>
 
     <!-- WHY CHOOSE US -->
-    <section id="why-choose-us" class="py-16 bg-slate-50">
+    <section id="why-choose-us" class="page py-16 bg-slate-50">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 class="text-2xl font-semibold">Why Choose SkyReach?</h2>
         <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -325,7 +287,7 @@
     </section>
 
     <!-- GALLERY -->
-    <section id="gallery" class="py-16">
+    <section id="gallery" class="page py-16">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between">
           <h2 class="text-2xl font-semibold">Gallery</h2>
@@ -337,33 +299,27 @@
           <button class="gallery-item block rounded overflow-hidden focus-ring" data-src="https://placehold.co/1200x800/0f4e9c/ffffff?text=SkyReach+1" aria-label="Open image 1">
             <img src="https://placehold.co/600x400/0f4e9c/ffffff?text=SkyReach+1" alt="SkyReach gallery image 1" class="w-full h-40 object-cover">
           </button>
-
           <button class="gallery-item block rounded overflow-hidden focus-ring" data-src="https://placehold.co/1200x800/1e63c8/ffffff?text=SkyReach+2" aria-label="Open image 2">
             <img src="https://placehold.co/600x400/1e63c8/ffffff?text=SkyReach+2" alt="SkyReach gallery image 2" class="w-full h-40 object-cover">
           </button>
-
           <button class="gallery-item block rounded overflow-hidden focus-ring" data-src="https://placehold.co/1200x800/0b61a6/ffffff?text=SkyReach+3" aria-label="Open image 3">
             <img src="https://placehold.co/600x400/0b61a6/ffffff?text=SkyReach+3" alt="SkyReach gallery image 3" class="w-full h-40 object-cover">
           </button>
-
           <button class="gallery-item block rounded overflow-hidden focus-ring" data-src="https://placehold.co/1200x800/2b6cb0/ffffff?text=SkyReach+4" aria-label="Open image 4">
             <img src="https://placehold.co/600x400/2b6cb0/ffffff?text=SkyReach+4" alt="SkyReach gallery image 4" class="w-full h-40 object-cover">
           </button>
-
           <button class="gallery-item block rounded overflow-hidden focus-ring" data-src="https://placehold.co/1200x800/2647a1/ffffff?text=SkyReach+5" aria-label="Open image 5">
             <img src="https://placehold.co/600x400/2647a1/ffffff?text=SkyReach+5" alt="SkyReach gallery image 5" class="w-full h-40 object-cover">
           </button>
-
           <button class="gallery-item block rounded overflow-hidden focus-ring" data-src="https://placehold.co/1200x800/1a4fa0/ffffff?text=SkyReach+6" aria-label="Open image 6">
             <img src="https://placehold.co/600x400/1a4fa0/ffffff?text=SkyReach+6" alt="SkyReach gallery image 6" class="w-full h-40 object-cover">
           </button>
-
         </div>
       </div>
     </section>
 
     <!-- CONTACT -->
-    <section id="contact" class="py-16 bg-slate-50">
+    <section id="contact" class="page py-16 bg-slate-50">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
@@ -373,7 +329,7 @@
             <dl class="mt-6 text-sm text-slate-600 space-y-3">
               <div><strong>Email:</strong> <a href="mailto:info@skyreachuk.co.uk" class="underline">info@skyreachuk.co.uk</a></div>
               <div><strong>Location:</strong> United Kingdom</div>
-              <div><strong>Members area:</strong> <a href="#" class="underline">Login</a></div>
+              <div><strong>Members area:</strong> <a href="#login" data-link class="underline">Login</a></div>
             </dl>
           </div>
 
@@ -381,19 +337,100 @@
             <div id="formFeedback" class="hidden text-sm p-3 rounded mb-3"></div>
 
             <label class="block text-sm font-medium">Name</label>
-            <input id="name" name="name" class="mt-1 block w-full rounded-md border px-3 py-2" required>
+            <input id="c_name" name="name" class="mt-1 block w-full rounded-md border px-3 py-2" required>
 
             <label class="block text-sm font-medium mt-4">Email</label>
-            <input id="email" name="email" type="email" class="mt-1 block w-full rounded-md border px-3 py-2" required>
+            <input id="c_email" name="email" type="email" class="mt-1 block w-full rounded-md border px-3 py-2" required>
 
             <label class="block text-sm font-medium mt-4">Message</label>
-            <textarea id="message" name="message" rows="4" class="mt-1 block w-full rounded-md border px-3 py-2" required></textarea>
+            <textarea id="c_message" name="message" rows="4" class="mt-1 block w-full rounded-md border px-3 py-2" required></textarea>
 
             <div class="mt-4 flex items-center justify-between gap-3">
               <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 rounded-md text-white" style="background:var(--sr-blue-600)">Send Message</button>
               <button type="button" id="clearForm" class="text-sm text-slate-500">Clear</button>
             </div>
           </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOGIN (page) -->
+    <section id="login" class="page py-16">
+      <div class="max-w-md mx-auto px-4">
+        <div class="bg-white p-6 rounded-lg shadow">
+          <h2 class="text-xl font-semibold mb-4">Login to SkyReach</h2>
+          <div id="loginFeedback" class="hidden mb-3 text-sm p-2 rounded"></div>
+          <form id="loginForm">
+            <label class="block text-sm font-medium">Email</label>
+            <input id="loginEmail" type="email" class="mt-1 block w-full rounded-md border px-3 py-2" required>
+
+            <label class="block text-sm font-medium mt-4">Password</label>
+            <input id="loginPassword" type="password" class="mt-1 block w-full rounded-md border px-3 py-2" required>
+
+            <div class="flex items-center justify-between mt-4">
+              <button type="submit" class="px-4 py-2 bg-[var(--sr-blue-600)] text-white rounded">Sign in</button>
+              <a href="#signup" data-link class="text-sm text-slate-600">Create an account</a>
+            </div>
+          </form>
+          <div class="mt-4 text-xs text-slate-500">Use demo account: <strong>admin@skyreach.com</strong> / <strong>password123</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SIGNUP (page) -->
+    <section id="signup" class="page py-16 bg-slate-50">
+      <div class="max-w-md mx-auto px-4">
+        <div class="bg-white p-6 rounded-lg shadow">
+          <h2 class="text-xl font-semibold mb-4">Create account</h2>
+          <div id="signupFeedback" class="hidden mb-3 text-sm p-2 rounded"></div>
+          <form id="signupForm">
+            <label class="block text-sm font-medium">Full name</label>
+            <input id="signupName" class="mt-1 block w-full rounded-md border px-3 py-2" required>
+
+            <label class="block text-sm font-medium mt-4">Email</label>
+            <input id="signupEmail" type="email" class="mt-1 block w-full rounded-md border px-3 py-2" required>
+
+            <label class="block text-sm font-medium mt-4">Password</label>
+            <input id="signupPassword" type="password" class="mt-1 block w-full rounded-md border px-3 py-2" required>
+
+            <div class="flex items-center justify-between mt-4">
+              <button type="submit" class="px-4 py-2 bg-[var(--sr-blue-600)] text-white rounded">Create account</button>
+              <a href="#login" data-link class="text-sm text-slate-600">Already have an account?</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- DASHBOARD (protected) -->
+    <section id="dashboard" class="page py-16 bg-white">
+      <div class="max-w-5xl mx-auto px-4">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-semibold">Member Dashboard</h2>
+          <div>
+            <button id="btnLogout" class="px-3 py-2 border rounded">Logout</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="p-4 bg-slate-50 rounded">
+            <h3 class="font-semibold">Profile</h3>
+            <div id="memberProfile" class="mt-3 text-sm text-slate-700">Loading...</div>
+          </div>
+
+          <div class="p-4 bg-slate-50 rounded">
+            <h3 class="font-semibold">Quick Links</h3>
+            <ul class="mt-3 text-sm">
+              <li><a href="#gallery" data-link class="underline">Gallery</a></li>
+              <li><a href="#services" data-link class="underline">Services</a></li>
+              <li><a href="#contact" data-link class="underline">Contact support</a></li>
+            </ul>
+          </div>
+
+          <div class="p-4 bg-slate-50 rounded">
+            <h3 class="font-semibold">Announcements</h3>
+            <div class="mt-3 text-sm text-slate-600">No announcements yet.</div>
+          </div>
         </div>
       </div>
     </section>
@@ -413,9 +450,9 @@
         </div>
 
         <div class="text-sm text-slate-600">
-          <a href="#privacy" class="inline-block mr-4">Privacy</a>
-          <a href="#terms" class="inline-block mr-4">Terms</a>
-          <a href="#contact" class="inline-block">Contact</a>
+          <a href="#privacy" class="inline-block mr-4" data-link>Privacy</a>
+          <a href="#terms" class="inline-block mr-4" data-link>Terms</a>
+          <a href="#contact" class="inline-block" data-link>Contact</a>
         </div>
       </div>
     </footer>
@@ -436,94 +473,113 @@
     </div>
   </div>
 
-  <!-- SCRIPTS: All inline (ES6+) -->
+  <!-- INLINE SCRIPT: All JS in this file -->
   <script>
-    /* =========================
-       Mobile nav toggle
-       ========================= */
+    /***********************
+     * Utilities & DOM refs
+     ***********************/
+    const pages = Array.from(document.querySelectorAll('.page'));
+    const links = document.querySelectorAll('[data-link]');
     const navToggle = document.getElementById('navToggle');
     const mobileNav = document.getElementById('mobileNav');
     const navOpenIcon = document.getElementById('navOpenIcon');
     const navCloseIcon = document.getElementById('navCloseIcon');
+    const heroLogin = document.getElementById('heroLogin');
+    const navLoginBtn = document.getElementById('navLoginBtn');
+    const navSignupBtn = document.getElementById('navSignupBtn');
+    const mobileLoginBtn = document.getElementById('mobileLoginBtn');
+    const mobileSignupBtn = document.getElementById('mobileSignupBtn');
 
+    /* =========================
+       Simple SPA routing (hash-based)
+       - All pages are sections with IDs and .page class.
+       - Router shows the requested section (or #home).
+       - Dashboard is protected (requires auth token).
+       ========================= */
+    function showPage(id) {
+      // Protected route for dashboard
+      if (id === 'dashboard' && !auth.isAuthenticated()) {
+        // redirect to login with a message
+        setLoginFeedback('Please sign in to access the members area.');
+        id = 'login';
+        location.hash = '#login';
+      }
+
+      pages.forEach(p => p.id === id ? p.classList.add('active') : p.classList.remove('active'));
+
+      // set active nav link visuals
+      document.querySelectorAll('.nav-link').forEach(a => {
+        const target = a.getAttribute('href') || '';
+        a.classList.toggle('text-slate-900', target === '#' + id);
+        a.classList.toggle('font-semibold', target === '#' + id);
+      });
+
+      // update document title minimally
+      const titleMap = {
+        home: 'Home', about: 'About', services: 'Services', 'why-choose-us': 'Why Choose Us', gallery: 'Gallery',
+        contact: 'Contact', login: 'Login', signup: 'Sign up', dashboard: 'Dashboard'
+      };
+      document.title = `SkyReach — ${titleMap[id] || 'Virtual Airline'}`;
+
+      // close mobile nav if open
+      if (!mobileNav.classList.contains('hidden')) {
+        mobileNav.classList.add('hidden');
+        navOpenIcon.classList.remove('hidden');
+        navCloseIcon.classList.add('hidden');
+      }
+    }
+
+    // Listen to click links that use data-link (internal navigation)
+    links.forEach(a => a.addEventListener('click', e => {
+      const href = a.getAttribute('href') || '';
+      if (href.startsWith('#')) {
+        const id = href.slice(1) || 'home';
+        e.preventDefault();
+        location.hash = '#' + id;
+        showPage(id);
+      }
+    }));
+
+    // On hash change or first load, show appropriate page
+    function handleRouting() {
+      const hash = location.hash.replace('#','') || 'home';
+      showPage(hash);
+    }
+    window.addEventListener('hashchange', handleRouting);
+    window.addEventListener('load', handleRouting);
+
+    /* =========================
+       Mobile nav toggle
+       ========================= */
     navToggle.addEventListener('click', () => {
-      const open = mobileNav.classList.toggle('hidden');
-      // toggle icons
+      mobileNav.classList.toggle('hidden');
       navOpenIcon.classList.toggle('hidden');
       navCloseIcon.classList.toggle('hidden');
     });
 
-    /* =========================
-       Smooth scroll for anchor links
-       ========================= */
-    document.querySelectorAll('a[href^="#"]').forEach(a => {
-      a.addEventListener('click', function (e) {
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          e.preventDefault();
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          // close mobile nav on selection
-          if (!mobileNav.classList.contains('hidden')) {
-            mobileNav.classList.add('hidden');
-            navOpenIcon.classList.remove('hidden');
-            navCloseIcon.classList.add('hidden');
-          }
-        }
-      });
-    });
+    /* Hook hero login and header login/signup buttons */
+    if (heroLogin) heroLogin.addEventListener('click', () => { location.hash = '#login'; showPage('login'); });
+    navLoginBtn && navLoginBtn.addEventListener('click', () => { location.hash = '#login'; showPage('login'); });
+    navSignupBtn && navSignupBtn.addEventListener('click', () => { location.hash = '#signup'; showPage('signup'); });
+    mobileLoginBtn && mobileLoginBtn.addEventListener('click', () => { location.hash = '#login'; showPage('login'); });
+    mobileSignupBtn && mobileSignupBtn.addEventListener('click', () => { location.hash = '#signup'; showPage('signup'); });
 
     /* =========================
-       Active nav link highlighting
-       Uses IntersectionObserver to add "active" class when a section is visible.
-       ========================= */
-    const sections = document.querySelectorAll('main section[id]');
-    const navLinks = document.querySelectorAll('.nav-link');
-
-    // Helper: remove active state
-    function clearActive() {
-      navLinks.forEach(l => l.classList.remove('text-slate-900', 'font-semibold'));
-    }
-
-    // Observe when each section is intersecting the viewport
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          // find the nav link that matches
-          const id = entry.target.id;
-          clearActive();
-          const activeLink = document.querySelectorAll(`.nav-link[href="#${id}"]`);
-          activeLink.forEach(a => a.classList.add('text-slate-900','font-semibold'));
-          // Also highlight top-level links in header if present (desktop)
-        }
-      });
-    }, {
-      root: null,
-      rootMargin: '-40% 0px -40% 0px', // trigger when section near center
-      threshold: 0
-    });
-
-    sections.forEach(s => observer.observe(s));
-
-    /* =========================
-       "Read more / Read less" toggles for services
-       Animated by changing max-height & classes; uses data attributes.
+       Collapsible "Read more" toggles for services
        ========================= */
     const toggleBtns = document.querySelectorAll('.toggle-btn');
     toggleBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', () => {
         const targetId = btn.dataset.target;
         const el = document.querySelector(`.collapsible[data-id="${targetId}"]`);
+        if (!el) return;
         const isCollapsed = el.classList.contains('collapsed');
-
         if (isCollapsed) {
-          // Expand: measure content then set max-height to enable transition
           el.classList.remove('collapsed');
-          // compute natural height
           el.style.maxHeight = el.scrollHeight + 'px';
           btn.textContent = 'Read less';
           btn.setAttribute('aria-expanded','true');
         } else {
-          // Collapse
           el.style.maxHeight = '0px';
           el.classList.add('collapsed');
           btn.textContent = 'Read more';
@@ -531,20 +587,14 @@
         }
       });
     });
-
-    // On window resize, clear explicit max-heights so measurement remains correct
     window.addEventListener('resize', () => {
       document.querySelectorAll('.collapsible').forEach(el => {
-        if (!el.classList.contains('collapsed')) {
-          el.style.maxHeight = el.scrollHeight + 'px';
-        }
+        if (!el.classList.contains('collapsed')) el.style.maxHeight = el.scrollHeight + 'px';
       });
     });
 
     /* =========================
-       Gallery modal (lightbox)
-       - Clicking a .gallery-item opens the modal and sets the image src
-       - Simple accessible close handlers included
+       Gallery lightbox
        ========================= */
     const galleryItems = document.querySelectorAll('.gallery-item');
     const lightbox = document.getElementById('lightbox');
@@ -556,101 +606,206 @@
       lightboxImg.alt = alt || 'Gallery image';
       lightbox.classList.remove('hidden');
       lightbox.style.display = 'flex';
-      document.body.style.overflow = 'hidden'; // prevent background scroll
+      document.body.style.overflow = 'hidden';
       lightboxClose.focus();
     }
-
     function closeLightbox() {
       lightbox.classList.add('hidden');
       lightbox.style.display = '';
       lightboxImg.src = '';
       document.body.style.overflow = '';
     }
-
-    galleryItems.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const src = btn.dataset.src;
-        const alt = btn.querySelector('img')?.alt || 'Gallery image';
-        openLightbox(src, alt);
-      });
-    });
-
-    // Close handlers
+    galleryItems.forEach(btn => btn.addEventListener('click', () => {
+      const src = btn.dataset.src;
+      const alt = btn.querySelector('img')?.alt || 'Gallery image';
+      openLightbox(src, alt);
+    }));
     lightboxClose.addEventListener('click', closeLightbox);
-    lightbox.addEventListener('click', (e) => {
-      if (e.target === lightbox) closeLightbox(); // click on backdrop
-    });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !lightbox.classList.contains('hidden')) closeLightbox();
-    });
+    lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !lightbox.classList.contains('hidden')) closeLightbox(); });
 
     /* =========================
-       Contact form client-side validation & simulated send
-       - Shows errors inline and displays success message on "send"
-       - No backend: simulates network latency and returns success
+       Contact form (simulated)
        ========================= */
     const contactForm = document.getElementById('contactForm');
     const feedbackEl = document.getElementById('formFeedback');
     const clearBtn = document.getElementById('clearForm');
 
-    function setFeedback(type, message) {
-      feedbackEl.classList.remove('hidden');
-      feedbackEl.textContent = message;
-      feedbackEl.className = '';
-      feedbackEl.classList.add('rounded', 'text-sm', 'p-3');
-      if (type === 'error') {
-        feedbackEl.classList.add('bg-red-50','text-red-700','border','border-red-100');
-      } else {
-        feedbackEl.classList.add('bg-green-50','text-green-800','border','border-green-100');
-      }
+    function setFeedback(element, type, message) {
+      if (!element) return;
+      element.classList.remove('hidden');
+      element.textContent = message;
+      element.className = '';
+      element.classList.add('rounded','text-sm','p-3');
+      if (type === 'error') element.classList.add('bg-red-50','text-red-700','border','border-red-100');
+      else if (type === 'success') element.classList.add('bg-green-50','text-green-800','border','border-green-100');
+      else element.classList.add('bg-blue-50','text-blue-800','border','border-blue-100');
     }
 
-    contactForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      // simple validation
-      const name = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const message = document.getElementById('message').value.trim();
-
-      if (!name || !email || !message) {
-        setFeedback('error', 'Please complete all fields before sending.');
-        return;
-      }
-
-      // basic email format check
-      if (!/^\S+@\S+\.\S+$/.test(email)) {
-        setFeedback('error', 'Please enter a valid email address.');
-        return;
-      }
-
-      // simulate sending
-      setFeedback('info', 'Sending message...');
-      const submitButton = contactForm.querySelector('button[type="submit"]');
-      submitButton.disabled = true;
-      submitButton.style.opacity = '0.7';
-
-      setTimeout(() => {
-        // success
-        setFeedback('success', 'Message sent! We will get back to you soon.');
-        contactForm.reset();
-        submitButton.disabled = false;
-        submitButton.style.opacity = '';
-      }, 900); // short simulated delay
-    });
-
-    clearBtn.addEventListener('click', () => {
-      contactForm.reset();
-      feedbackEl.classList.add('hidden');
-    });
+    if (contactForm) {
+      contactForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('c_name').value.trim();
+        const email = document.getElementById('c_email').value.trim();
+        const message = document.getElementById('c_message').value.trim();
+        if (!name || !email || !message) { setFeedback(feedbackEl,'error','Please complete all fields before sending.'); return; }
+        if (!/^\S+@\S+\.\S+$/.test(email)) { setFeedback(feedbackEl,'error','Please enter a valid email address.'); return; }
+        setFeedback(feedbackEl,'info','Sending message...');
+        const btn = contactForm.querySelector('button[type="submit"]');
+        btn.disabled = true; btn.style.opacity = '0.7';
+        // Simulate send (replace with real form endpoint if desired)
+        setTimeout(() => {
+          setFeedback(feedbackEl,'success','Message sent! We will get back to you soon.');
+          contactForm.reset();
+          btn.disabled = false; btn.style.opacity = '';
+        }, 900);
+      });
+      clearBtn.addEventListener('click', () => { contactForm.reset(); feedbackEl.classList.add('hidden'); });
+    }
 
     /* =========================
-       Accessibility enhancements:
-       - ensure focus lands on newly opened modal close button (done)
-       - ensure focusable controls have visible focus rings (via .focus-ring)
+       Simple mock-auth system (signup/login/store using localStorage)
+       - Keeps things client-side for a static single-file site
+       - Stores a "users" array in localStorage and sets an "authToken" when logged in
+       - Default demo account: admin@skyreach.com / password123 (created automatically if absent)
        ========================= */
 
+    const AUTH_KEY = 'skyreach_auth';
+    const USERS_KEY = 'skyreach_users';
+
+    const auth = {
+      // returns true if a token present
+      isAuthenticated() { return Boolean(localStorage.getItem(AUTH_KEY)); },
+      // set token (simple string)
+      setToken(token) { localStorage.setItem(AUTH_KEY, token); },
+      // remove token
+      clearToken() { localStorage.removeItem(AUTH_KEY); },
+      getToken() { return localStorage.getItem(AUTH_KEY); }
+    };
+
+    // ensure demo user exists
+    function ensureDemoUser() {
+      const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+      const demo = users.find(u => u.email === 'admin@skyreach.com');
+      if (!demo) {
+        users.push({ name: 'Admin', email: 'admin@skyreach.com', password: 'password123' });
+        localStorage.setItem(USERS_KEY, JSON.stringify(users));
+      }
+    }
+    ensureDemoUser();
+
+    // signup
+    const signupForm = document.getElementById('signupForm');
+    const signupFeedback = document.getElementById('signupFeedback');
+    if (signupForm) {
+      signupForm.addEventListener('submit', e => {
+        e.preventDefault();
+        const name = document.getElementById('signupName').value.trim();
+        const email = document.getElementById('signupEmail').value.trim().toLowerCase();
+        const password = document.getElementById('signupPassword').value;
+        if (!name || !email || !password) { setFeedback(signupFeedback,'error','Please complete all fields.'); return; }
+        if (!/^\S+@\S+\.\S+$/.test(email)) { setFeedback(signupFeedback,'error','Please enter a valid email.'); return; }
+        const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+        if (users.find(u => u.email === email)) { setFeedback(signupFeedback,'error','An account with that email already exists.'); return; }
+        users.push({ name, email, password });
+        localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        setFeedback(signupFeedback,'success','Account created — you are now signed in.');
+        // sign in immediately
+        auth.setToken(email + '::token');
+        // small delay then show dashboard
+        setTimeout(() => { location.hash = '#dashboard'; showPage('dashboard'); renderProfile(); }, 600);
+      });
+    }
+
+    // login
+    const loginForm = document.getElementById('loginForm');
+    const loginFeedback = document.getElementById('loginFeedback');
+    function setLoginFeedback(msg) { setFeedback(loginFeedback,'info',msg); }
+    if (loginForm) {
+      loginForm.addEventListener('submit', e => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+        const password = document.getElementById('loginPassword').value;
+        if (!email || !password) { setFeedback(loginFeedback,'error','Please enter your email and password.'); return; }
+        const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+        const user = users.find(u => u.email === email && u.password === password);
+        if (!user) { setFeedback(loginFeedback,'error','Invalid email or password.'); return; }
+        // success: set token and redirect to dashboard
+        auth.setToken(email + '::token');
+        setFeedback(loginFeedback,'success','Logged in. Redirecting to dashboard...');
+        setTimeout(() => { location.hash = '#dashboard'; showPage('dashboard'); renderProfile(); }, 600);
+      });
+    }
+
+    // logout
+    const btnLogout = document.getElementById('btnLogout');
+    if (btnLogout) btnLogout.addEventListener('click', () => {
+      auth.clearToken();
+      location.hash = '#home';
+      showPage('home');
+      // show small toast-like feedback (re-using profile area)
+      alert('You have been logged out.');
+    });
+
+    // render member profile in dashboard
+    function renderProfile() {
+      const profileEl = document.getElementById('memberProfile');
+      if (!profileEl) return;
+      if (!auth.isAuthenticated()) { profileEl.textContent = 'Not signed in.'; return; }
+      const token = auth.getToken();
+      const email = token.split('::')[0];
+      const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+      const user = users.find(u => u.email === email);
+      if (!user) { profileEl.textContent = 'Member info not found.'; return; }
+      profileEl.innerHTML = `<div class="font-medium">${escapeHtml(user.name || '(no name)')}</div><div class="text-xs text-slate-500">${escapeHtml(user.email)}</div>`;
+    }
+
+    // small HTML escape helper
+    function escapeHtml(s) { return String(s).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'" :'&#39;','"':'&quot;'}[c])); }
+
+    // On each route change, if dashboard open, update profile
+    window.addEventListener('hashchange', () => {
+      if (location.hash === '#dashboard') renderProfile();
+    });
+
     /* =========================
-       End of inline scripts
+       Accessibility: active nav highlighting using IntersectionObserver
+       Keep this secondary — we also drive pages via SPA routing above
+       ========================= */
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const id = entry.target.id;
+        const link = document.querySelector(`.nav-link[href="#${id}"]`);
+        if (link) link.classList.toggle('text-slate-900 font-semibold', entry.isIntersecting);
+      });
+    }, { root: null, threshold: 0.5 });
+
+    document.querySelectorAll('main section[id]').forEach(s => sectionObserver.observe(s));
+
+    /* =========================
+       Initialize: ensure correct initial route
+       ========================= */
+    (function init() {
+      // If user already has auth token on page load and hash is dashboard, show profile
+      if (location.hash === '#dashboard' && auth.isAuthenticated()) renderProfile();
+      // If explicit hash present, show that; else show home
+      handleRouting();
+      // Ensure demo user exists (again)
+      ensureDemoUser();
+    })();
+
+    /* =========================
+       Small helpers to set login feedback from elsewhere
+       ========================= */
+    function setLoginFeedback(message) {
+      setFeedback(document.getElementById('loginFeedback'),'info',message);
+    }
+
+    // Provide quick keyboard shortcut: press "g" to go to gallery (demo nicety)
+    document.addEventListener('keydown', (e) => { if (e.key === 'g') { location.hash = '#gallery'; showPage('gallery'); } });
+
+    /* =========================
+       End of script
        ========================= */
   </script>
 </body>
