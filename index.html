@@ -3,655 +3,220 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SkyReach — Virtual Airline (Rebuild)</title>
-
-  <!-- Tailwind CDN (allowed) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Tailwind config: set custom colors & font-family via inline style -->
+  <title>SkyReach VA — Professional Single File App</title>
+  <meta name="description" content="SkyReach Virtual Airline — polished single-file web app for flight planning, fleet and pilot management, and AI assistant." />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
   <style>
     :root{
-      --sr-blue: #0f4e9c;      /* deep blue */
-      --sr-blue-600: #1e63c8;  /* accent / CTA */
-      --sr-gray-100: #f7fafc;
-      --sr-muted: #6b7280;
-      --sr-accent: #ffb020;    /* warm accent */
+      --bg:#071427; --panel:#0d2b44; --muted:#9fb4c8; --accent:#63b3ff; --gold:#e0b45c; --glass:rgba(255,255,255,0.03); --card:#071c2b;
+      --radius:14px; --shadow: 0 8px 30px rgba(2,6,23,0.55);
     }
+    [data-theme="light"]{ --bg:#f4f7fb; --panel:#fff; --muted:#42515e; --accent:#0b66ff; --gold:#c79a4b; --card:#f6fbff }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;color:var(--muted);background:linear-gradient(180deg,var(--bg),#042036);-webkit-font-smoothing:antialiased}
 
-    /* Use Tailwind's utility classes, but add a few small custom rules */
-    html,body,#app { height: 100%; }
-    body {
-      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-      color: #0f172a;
-    }
+    .wrap{max-width:1260px;margin:28px auto;padding:18px}
+    header{display:flex;align-items:center;gap:18px}
+    .brand{display:flex;align-items:center;gap:14px}
+    .logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--gold));display:flex;align-items:center;justify-content:center;font-weight:800;color:#021;box-shadow:0 6px 18px rgba(2,8,12,0.6)}
+    h1{margin:0;color:#fff;font-size:22px}
+    .subtitle{font-size:13px;color:rgba(255,255,255,0.6)}
 
-    /* subtle glass for hero overlay */
-    .glass {
-      background: rgba(255,255,255,0.6);
-      backdrop-filter: blur(6px);
-    }
+    nav{margin-left:auto;display:flex;gap:8px}
+    .navbtn{background:transparent;border:none;color:rgba(255,255,255,0.65);padding:9px 12px;border-radius:10px;cursor:pointer;font-weight:600;transition:all .18s}
+    .navbtn:hover{transform:translateY(-2px)}
+    .navbtn.active{background:rgba(255,255,255,0.04);color:var(--accent);box-shadow:inset 0 -2px 0 rgba(255,255,255,0.02)}
 
-    /* Animated expand/collapse for service descriptions */
-    .collapsible {
-      transition: max-height 320ms cubic-bezier(.2,.8,.2,1), opacity 220ms;
-      overflow: hidden;
-      opacity: 1;
-    }
+    main{display:grid;grid-template-columns:1fr 360px;gap:20px;margin-top:22px}
+    .panel{background:var(--panel);padding:18px;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+    .panel h2{margin:0 0 10px 0;color:white}
+    .muted{font-size:13px;color:var(--muted)}
 
-    .collapsible.collapsed {
-      max-height: 0;
-      opacity: 0;
-    }
+    /* Dashboard grid */
+    .overview{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:14px;border-radius:12px}
+    .card .big{font-size:22px;color:var(--accent);font-weight:800}
+    .card .small{font-size:12px;color:var(--muted)}
 
-    /* focus ring for accessibility */
-    .focus-ring:focus {
-      outline: 3px solid rgba(30,99,200,0.22);
-      outline-offset: 2px;
-    }
+    /* Planner / Forms */
+    label{display:block;font-size:13px;margin-bottom:6px;color:var(--muted)}
+    input,select,textarea,button{font-family:inherit}
+    .input{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--muted)}
+    .row{display:flex;gap:10px}
+    .row > *{flex:1}
+    .btn{background:linear-gradient(90deg,var(--accent),var(--gold));border:none;color:#021;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:800}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);font-weight:600}
 
-    /* Lightbox modal base */
-    .modal-backdrop {
-      background: rgba(2,6,23,0.6);
-      backdrop-filter: blur(2px);
-    }
+    /* Lists */
+    .list{display:flex;flex-direction:column;gap:10px}
+    .list-item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent)}
+    .meta{display:flex;flex-direction:column}
+    .meta .title{font-weight:700;color:#fff}
+    .actions{display:flex;gap:8px}
 
-    /* subtle scrollbar styling (non-critical) */
-    ::-webkit-scrollbar { height: 12px; width: 10px; }
-    ::-webkit-scrollbar-thumb { background: rgba(15,78,156,0.12); border-radius: 8px; }
+    /* Fleet */
+    .aircraft{display:flex;gap:12px;align-items:center}
+    .plane{width:74px;height:54px;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);display:flex;align-items:center;justify-content:center;font-weight:700}
+
+    /* Assistant */
+    #assistant{display:flex;flex-direction:column;height:360px}
+    #chat{flex:1;overflow:auto;padding:10px;display:flex;flex-direction:column;gap:10px}
+    .bubble{padding:10px;border-radius:12px;background:rgba(255,255,255,0.03);max-width:78%;line-height:1.4}
+    .bubble.user{align-self:flex-end;background:linear-gradient(90deg,var(--accent),var(--gold));color:#021}
+    #msgbox{display:flex;gap:8px;margin-top:12px}
+
+    /* Modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center}
+    .modal{width:720px;background:var(--card);border-radius:12px;padding:18px;box-shadow:0 20px 60px rgba(2,6,23,0.7)}
+
+    footer{margin-top:20px;text-align:center;color:var(--muted);font-size:13px}
+
+    /* responsive */
+    @media (max-width:980px){main{grid-template-columns:1fr}nav{display:none}.logo{width:52px;height:52px}}
   </style>
-
-  <meta name="description" content="SkyReach Virtual Airline — connecting you through the skies. Rebuilt single-page site." />
 </head>
-<body class="antialiased text-slate-900" id="app">
-
-  <!-- STICKY NAV -->
-  <header class="fixed top-0 left-0 w-full z-50 shadow-sm bg-white/60 backdrop-blur glass">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <nav class="flex items-center justify-between h-16">
-        <div class="flex items-center space-x-3">
-          <a href="#home" class="flex items-center gap-3">
-            <div class="h-9 w-9 rounded-full overflow-hidden flex items-center justify-center bg-[var(--sr-blue)] text-white font-bold">
-  <img src="images/logo.png" alt="SkyReach Logo" class="h-full w-full object-cover" onerror="this.style.display='none'">
-  <span class="sr-only">SkyReach</span>
-</div>
-
-            <div class="hidden sm:block">
-              <span class="font-semibold text-lg tracking-tight">SkyReach</span>
-              <div class="text-xs text-slate-500 -mt-0.5">Virtual Airline</div>
-            </div>
-          </a>
-        </div>
-
-        <div class="hidden md:flex items-center space-x-6">
-          <a class="nav-link text-slate-700 hover:text-slate-900 py-2 px-1" href="#home">Home</a>
-          <a class="nav-link text-slate-700 hover:text-slate-900 py-2 px-1" href="#about">About</a>
-          <a class="nav-link text-slate-700 hover:text-slate-900 py-2 px-1" href="#services">Services</a>
-          <a class="nav-link text-slate-700 hover:text-slate-900 py-2 px-1" href="#why-choose-us">Why Choose Us</a>
-          <a class="nav-link text-slate-700 hover:text-slate-900 py-2 px-1" href="#gallery">Gallery</a>
-          <a class="nav-link text-slate-700 hover:text-slate-900 py-2 px-1" href="#contact">Contact</a>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <a href="#contact" class="hidden sm:inline-block rounded-md px-4 py-2 text-sm font-medium focus-ring" style="background:var(--sr-blue-600);color:white">Contact Us</a>
-
-          <!-- Mobile menu button -->
-          <button id="navToggle" class="md:hidden p-2 rounded-md focus-ring" aria-label="Open menu">
-            <svg id="navOpenIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" /></svg>
-            <svg id="navCloseIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-          </button>
-        </div>
-      </nav>
-    </div>
-
-    <!-- Mobile nav -->
-    <div id="mobileNav" class="md:hidden hidden border-t border-slate-100">
-      <div class="px-4 pb-4 space-y-2">
-        <a class="block nav-link py-2" href="#home">Home</a>
-        <a class="block nav-link py-2" href="#about">About</a>
-        <a class="block nav-link py-2" href="#services">Services</a>
-        <a class="block nav-link py-2" href="#why-choose-us">Why Choose Us</a>
-        <a class="block nav-link py-2" href="#gallery">Gallery</a>
-        <a class="block nav-link py-2" href="#contact">Contact</a>
-      </div>
-    </div>
-  </header>
-
-  <main class="pt-20">
-
-    <!-- HERO / HOME -->
-    <section id="home" class="min-h-[60vh] flex items-center">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-          <div class="py-12">
-            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight">Welcome to SkyReach Virtual Airline</h1>
-            <p class="mt-4 text-slate-600 max-w-xl">Connecting you through the skies. We bring a realistic, community-first virtual airline experience to flight sim pilots across the UK and beyond.</p>
-
-            <div class="mt-6 flex flex-wrap gap-3">
-              <a href="#services" class="inline-flex items-center gap-2 px-5 py-3 rounded-md shadow-sm text-sm font-semibold" style="background:var(--sr-blue-600); color:white">Our Services</a>
-              <a href="#contact" class="inline-flex items-center gap-2 px-5 py-3 rounded-md text-sm font-semibold border border-slate-200">Contact Us</a>
-            </div>
-
-            <div class="mt-8 text-sm text-slate-500">
-              <strong>Members:</strong> <a href="#" class="text-slate-700 underline">Login to Members Area</a>
-            </div>
-          </div>
-
-          <div class="relative">
-            <div class="rounded-xl overflow-hidden shadow-lg">
-              <img src="Assets/banner.png" alt="SkyReach banner" class="w-full h-full object-cover">
-            </div>
-            <div class="mt-3 text-xs text-slate-400">Image placeholder — replace with your images when ready.</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ABOUT -->
-    <section id="about" class="py-16 bg-white">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-          <div class="lg:col-span-2">
-            <h2 class="text-2xl font-semibold">About SkyReach</h2>
-            <p class="mt-4 text-slate-600 leading-relaxed">
-              SkyReach is a UK-based virtual airline focused on delivering an authentic and community-driven flying experience.
-              We provide structured events, route networks, and a friendly membership area where pilots can log flights, participate in challenges, and connect with other members.
-            </p>
-
-            <ul class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <li class="flex items-start gap-3">
-                <div class="flex-shrink-0 h-8 w-8 rounded-md bg-slate-100 flex items-center justify-center text-slate-600">✈️</div>
-                <div>
-                  <div class="font-medium">Realistic operations</div>
-                  <div class="text-sm text-slate-500">Procedures and routes prioritised for immersion.</div>
-                </div>
-              </li>
-              <li class="flex items-start gap-3">
-                <div class="flex-shrink-0 h-8 w-8 rounded-md bg-slate-100 flex items-center justify-center text-slate-600">👥</div>
-                <div>
-                  <div class="font-medium">Community-first</div>
-                  <div class="text-sm text-slate-500">Events, training, and social flying opportunities.</div>
-                </div>
-              </li>
-              <li class="flex items-start gap-3">
-                <div class="flex-shrink-0 h-8 w-8 rounded-md bg-slate-100 flex items-center justify-center text-slate-600">🧭</div>
-                <div>
-                  <div class="font-medium">UK Hubs</div>
-                  <div class="text-sm text-slate-500">Manchester, Luton, Gatwick, Edinburgh (example hubs).</div>
-                </div>
-              </li>
-              <li class="flex items-start gap-3">
-                <div class="flex-shrink-0 h-8 w-8 rounded-md bg-slate-100 flex items-center justify-center text-slate-600">🛠️</div>
-                <div>
-                  <div class="font-medium">Pilot support</div>
-                  <div class="text-sm text-slate-500">Guides, checklists and onboarding resources.</div>
-                </div>
-              </li>
-            </ul>
-          </div>
-
-          <aside class="bg-slate-50 p-4 rounded-lg">
-            <h3 class="text-sm font-semibold text-slate-800">Quick facts</h3>
-            <dl class="mt-3 text-sm text-slate-600 space-y-2">
-              <div><span class="font-medium">Founded</span>: 2024</div>
-              <div><span class="font-medium">ICAO</span>: SRH</div>
-              <div><span class="font-medium">Hubs</span>: MAN, LTN, LGW, EDI</div>
-            </dl>
-            <div class="mt-4"><a href="#contact" class="inline-block text-sm px-3 py-2 border rounded-md">Get in touch</a></div>
-          </aside>
-        </div>
-      </div>
-    </section>
-
-    <!-- SERVICES -->
-    <section id="services" class="py-16">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between">
-          <h2 class="text-2xl font-semibold">Our Services</h2>
-          <p class="text-sm text-slate-500">Realistic virtual airline services for members and community.</p>
-        </div>
-
-        <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Service card template repeated -->
-          <article class="rounded-lg border p-4">
-            <div class="flex items-start gap-4">
-              <img class="w-24 h-16 object-cover rounded" src="https://placehold.co/600x400/1e63c8/ffffff?text=A320+Ops" alt="A320 operations placeholder">
-              <div class="flex-1">
-                <h3 class="font-semibold">Fleet Ops & Route Network</h3>
-                <p class="mt-1 text-sm text-slate-500">Structured routes across our hubs and network.</p>
-
-                <!-- Collapsible description -->
-                <div class="mt-3">
-                  <div class="collapsible collapsed" data-id="svc-1" style="max-height:0">
-                    <p class="text-sm text-slate-600">
-                      We maintain a curated network of routes optimised for our fleet mix — A320neo, Embraer E190, ATR72/42.
-                      Members get access to preferred routes, recommended procedures and event routes for community fly-ins.
-                    </p>
-                  </div>
-
-                  <button class="mt-3 text-sm font-medium toggle-btn" data-target="svc-1" aria-expanded="false">
-                    Read more
-                  </button>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="rounded-lg border p-4">
-            <div class="flex items-start gap-4">
-              <img class="w-24 h-16 object-cover rounded" src="https://placehold.co/600x400/0f4e9c/ffffff?text=Training" alt="Pilot training placeholder">
-              <div class="flex-1">
-                <h3 class="font-semibold">Pilot Training & Mentoring</h3>
-                <p class="mt-1 text-sm text-slate-500">Structured mentoring and training programs.</p>
-
-                <div class="mt-3">
-                  <div class="collapsible collapsed" data-id="svc-2" style="max-height:0">
-                    <p class="text-sm text-slate-600">
-                      We provide mentoring, procedural training, and event coaching to help pilots improve technique,
-                      learn realistic approaches (including ILS procedures) and become active community members.
-                    </p>
-                  </div>
-
-                  <button class="mt-3 text-sm font-medium toggle-btn" data-target="svc-2" aria-expanded="false">Read more</button>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="rounded-lg border p-4">
-            <div class="flex items-start gap-4">
-              <img class="w-24 h-16 object-cover rounded" src="https://placehold.co/600x400/0b61a6/ffffff?text=Events" alt="Events and community placeholder">
-              <div class="flex-1">
-                <h3 class="font-semibold">Community Events</h3>
-                <p class="mt-1 text-sm text-slate-500">Regular fly-ins, group flights and competitions.</p>
-
-                <div class="mt-3">
-                  <div class="collapsible collapsed" data-id="svc-3" style="max-height:0">
-                    <p class="text-sm text-slate-600">
-                      Our events calendar features weekly group flights, seasonal events and challenges. Staff-led events
-                      include briefings, route packs and ATC coordination where possible.
-                    </p>
-                  </div>
-
-                  <button class="mt-3 text-sm font-medium toggle-btn" data-target="svc-3" aria-expanded="false">Read more</button>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="rounded-lg border p-4">
-            <div class="flex items-start gap-4">
-              <img class="w-24 h-16 object-cover rounded" src="https://placehold.co/600x400/2b6cb0/ffffff?text=Support" alt="Support and resources placeholder">
-              <div class="flex-1">
-                <h3 class="font-semibold">Guides & Resources</h3>
-                <p class="mt-1 text-sm text-slate-500">Checklists, how-tos and pilot resources.</p>
-
-                <div class="mt-3">
-                  <div class="collapsible collapsed" data-id="svc-4" style="max-height:0">
-                    <p class="text-sm text-slate-600">
-                      Downloadable guides, recommended procedure notes and checklists to support safe and realistic operations.
-                      Content is optimised for popular aircraft used by members.
-                    </p>
-                  </div>
-
-                  <button class="mt-3 text-sm font-medium toggle-btn" data-target="svc-4" aria-expanded="false">Read more</button>
-                </div>
-              </div>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- WHY CHOOSE US -->
-    <section id="why-choose-us" class="py-16 bg-slate-50">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-2xl font-semibold">Why Choose SkyReach?</h2>
-        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="p-6 bg-white rounded-lg shadow-sm">
-            <h3 class="font-semibold">Realism</h3>
-            <p class="mt-2 text-sm text-slate-500">Operations built around realistic procedures for immersion.</p>
-          </div>
-          <div class="p-6 bg-white rounded-lg shadow-sm">
-            <h3 class="font-semibold">Community</h3>
-            <p class="mt-2 text-sm text-slate-500">Active social flying and mentoring program.</p>
-          </div>
-          <div class="p-6 bg-white rounded-lg shadow-sm">
-            <h3 class="font-semibold">Support</h3>
-            <p class="mt-2 text-sm text-slate-500">Resources, training and friendly staff.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- GALLERY -->
-    <section id="gallery" class="py-16">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between">
-          <h2 class="text-2xl font-semibold">Gallery</h2>
-          <p class="text-sm text-slate-500">Click any image to view larger.</p>
-        </div>
-
-        <div class="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          <!-- Repeat placeholders -->
-          <button class="gallery-item block rounded overflow-hidden focus-ring" data-src="https://placehold.co/1200x800/0f4e9c/ffffff?text=SkyReach+1" aria-label="Open image 1">
-            <img src="https://placehold.co/600x400/0f4e9c/ffffff?text=SkyReach+1" alt="SkyReach gallery image 1" class="w-full h-40 object-cover">
-          </button>
-
-          <button class="gallery-item block rounded overflow-hidden focus-ring" data-src="https://placehold.co/1200x800/1e63c8/ffffff?text=SkyReach+2" aria-label="Open image 2">
-            <img src="https://placehold.co/600x400/1e63c8/ffffff?text=SkyReach+2" alt="SkyReach gallery image 2" class="w-full h-40 object-cover">
-          </button>
-
-          <button class="gallery-item block rounded overflow-hidden focus-ring" data-src="https://placehold.co/1200x800/0b61a6/ffffff?text=SkyReach+3" aria-label="Open image 3">
-            <img src="https://placehold.co/600x400/0b61a6/ffffff?text=SkyReach+3" alt="SkyReach gallery image 3" class="w-full h-40 object-cover">
-          </button>
-
-          <button class="gallery-item block rounded overflow-hidden focus-ring" data-src="https://placehold.co/1200x800/2b6cb0/ffffff?text=SkyReach+4" aria-label="Open image 4">
-            <img src="https://placehold.co/600x400/2b6cb0/ffffff?text=SkyReach+4" alt="SkyReach gallery image 4" class="w-full h-40 object-cover">
-          </button>
-
-          <button class="gallery-item block rounded overflow-hidden focus-ring" data-src="https://placehold.co/1200x800/2647a1/ffffff?text=SkyReach+5" aria-label="Open image 5">
-            <img src="https://placehold.co/600x400/2647a1/ffffff?text=SkyReach+5" alt="SkyReach gallery image 5" class="w-full h-40 object-cover">
-          </button>
-
-          <button class="gallery-item block rounded overflow-hidden focus-ring" data-src="https://placehold.co/1200x800/1a4fa0/ffffff?text=SkyReach+6" aria-label="Open image 6">
-            <img src="https://placehold.co/600x400/1a4fa0/ffffff?text=SkyReach+6" alt="SkyReach gallery image 6" class="w-full h-40 object-cover">
-          </button>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- CONTACT -->
-    <section id="contact" class="py-16 bg-slate-50">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div>
-            <h2 class="text-2xl font-semibold">Contact Us</h2>
-            <p class="mt-3 text-slate-600">Questions, membership enquiries, or event proposals — we'd love to hear from you.</p>
-
-            <dl class="mt-6 text-sm text-slate-600 space-y-3">
-              <div><strong>Email:</strong> <a href="mailto:info@skyreachuk.co.uk" class="underline">info@skyreachuk.co.uk</a></div>
-              <div><strong>Location:</strong> United Kingdom</div>
-              <div><strong>Members area:</strong> <a href="#" class="underline">Login</a></div>
-            </dl>
-          </div>
-
-          <form id="contactForm" class="bg-white p-6 rounded-lg shadow" novalidate>
-            <div id="formFeedback" class="hidden text-sm p-3 rounded mb-3"></div>
-
-            <label class="block text-sm font-medium">Name</label>
-            <input id="name" name="name" class="mt-1 block w-full rounded-md border px-3 py-2" required>
-
-            <label class="block text-sm font-medium mt-4">Email</label>
-            <input id="email" name="email" type="email" class="mt-1 block w-full rounded-md border px-3 py-2" required>
-
-            <label class="block text-sm font-medium mt-4">Message</label>
-            <textarea id="message" name="message" rows="4" class="mt-1 block w-full rounded-md border px-3 py-2" required></textarea>
-
-            <div class="mt-4 flex items-center justify-between gap-3">
-              <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 rounded-md text-white" style="background:var(--sr-blue-600)">Send Message</button>
-              <button type="button" id="clearForm" class="text-sm text-slate-500">Clear</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer class="bg-white border-t mt-12">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+<body data-theme="dark">
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">SRH</div>
         <div>
-          <div class="flex items-center gap-3">
-            <div class="h-10 w-10 rounded-full bg-[color:var(--sr-blue)] text-white flex items-center justify-center">SR</div>
-            <div>
-              <div class="font-semibold">SkyReach</div>
-              <div class="text-xs text-slate-500">Virtual Airline</div>
-            </div>
+          <h1>SkyReach Virtual Airline</h1>
+          <div class="subtitle">Professional single-file app — flight planning, fleet & pilots</div>
+        </div>
+      </div>
+
+      <nav id="nav">
+        <button class="navbtn active" data-target="dashboard">Dashboard</button>
+        <button class="navbtn" data-target="planner">Flight Planner</button>
+        <button class="navbtn" data-target="flights">My Flights</button>
+        <button class="navbtn" data-target="fleet">Fleet</button>
+        <button class="navbtn" data-target="assistant">AI Assistant</button>
+        <button class="navbtn" id="themeToggle">Toggle Theme</button>
+      </nav>
+    </header>
+
+    <main>
+      <section id="content" class="panel" aria-live="polite"></section>
+
+      <aside class="panel" aria-label="sidebar">
+        <h2>Quick Actions</h2>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:12px">
+          <button class="btn" id="quickNew">New Flight</button>
+          <button class="btn ghost" id="exportAll">Export Flights</button>
+          <button class="btn ghost" id="invSave">Download Data</button>
+          <button class="btn ghost" id="resetData">Reset Local Data</button>
+        </div>
+
+        <div style="margin-top:20px">
+          <h2>Overview</h2>
+          <div class="overview" style="margin-top:12px">
+            <div class="card"><div class="big" id="statFlights">0</div><div class="small">Total Flights</div></div>
+            <div class="card"><div class="big" id="statPilots">0</div><div class="small">Pilots</div></div>
+            <div class="card"><div class="big" id="statFleet">0</div><div class="small">Fleet size</div></div>
           </div>
-          <div class="mt-3 text-sm text-slate-500">© 2025 SkyReach Virtual Airline — All rights reserved.</div>
-        </div>
 
-        <div class="text-sm text-slate-600">
-          <a href="#privacy" class="inline-block mr-4">Privacy</a>
-          <a href="#terms" class="inline-block mr-4">Terms</a>
-          <a href="#contact" class="inline-block">Contact</a>
+          <div style="margin-top:12px;font-size:13px;color:var(--muted)">Total Hours: <strong id="statHours">0</strong></div>
         </div>
-      </div>
-    </footer>
-  </main>
+      </aside>
+    </main>
 
-  <!-- LIGHTBOX / MODAL -->
-  <div id="lightbox" class="fixed inset-0 z-60 hidden items-center justify-center modal-backdrop">
-    <div class="max-w-4xl w-full px-4">
-      <div class="bg-white rounded-lg overflow-hidden shadow-lg">
-        <div class="flex items-center justify-between p-3 border-b">
-          <div class="text-sm font-medium">Image preview</div>
-          <button id="lightboxClose" class="p-2 focus-ring" aria-label="Close image preview">✕</button>
-        </div>
-        <div class="p-4">
-          <img id="lightboxImg" src="" alt="Expanded gallery image" class="w-full h-auto object-contain rounded">
-        </div>
-      </div>
-    </div>
+    <footer>SkyReach • Built for VA ops • Host anywhere • Exportable flight plans</footer>
   </div>
 
-  <!-- SCRIPTS: All inline (ES6+) -->
+  <!-- Modal container -->
+  <div id="modalRoot"></div>
+
   <script>
-    /* =========================
-       Mobile nav toggle
-       ========================= */
-    const navToggle = document.getElementById('navToggle');
-    const mobileNav = document.getElementById('mobileNav');
-    const navOpenIcon = document.getElementById('navOpenIcon');
-    const navCloseIcon = document.getElementById('navCloseIcon');
+    // --- Storage and state ---
+    const KEY = 'skyreach_app_v2';
+    const defaults = {fleet:[],pilots:[],flights:[]};
+    let state = loadState();
 
-    navToggle.addEventListener('click', () => {
-      const open = mobileNav.classList.toggle('hidden');
-      // toggle icons
-      navOpenIcon.classList.toggle('hidden');
-      navCloseIcon.classList.toggle('hidden');
-    });
-
-    /* =========================
-       Smooth scroll for anchor links
-       ========================= */
-    document.querySelectorAll('a[href^="#"]').forEach(a => {
-      a.addEventListener('click', function (e) {
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          e.preventDefault();
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          // close mobile nav on selection
-          if (!mobileNav.classList.contains('hidden')) {
-            mobileNav.classList.add('hidden');
-            navOpenIcon.classList.remove('hidden');
-            navCloseIcon.classList.add('hidden');
-          }
-        }
-      });
-    });
-
-    /* =========================
-       Active nav link highlighting
-       Uses IntersectionObserver to add "active" class when a section is visible.
-       ========================= */
-    const sections = document.querySelectorAll('main section[id]');
-    const navLinks = document.querySelectorAll('.nav-link');
-
-    // Helper: remove active state
-    function clearActive() {
-      navLinks.forEach(l => l.classList.remove('text-slate-900', 'font-semibold'));
+    // --- Initialize with tasteful sample data if empty ---
+    function seedIfEmpty(){
+      if(state.fleet.length===0){ state.fleet.push({id:uid(),name:'Airbus A320neo',icao:'A320',range_nm:3300,cruise_kts:450,capacity:180}); state.fleet.push({id:uid(),name:'Embraer E190',icao:'E190',range_nm:2400,cruise_kts:420,capacity:100}); }
+      if(state.pilots.length===0){ state.pilots.push({id:uid(),name:'Captain Luca',hours:420,rank:'Senior'}); }
+      if(state.flights.length===0){ state.flights.push({id:uid(),dep:'EGCC',arr:'EGKK',aircraftId:state.fleet[0].id,block_mins:75,pilotId:state.pilots[0].id,status:'Scheduled',date:new Date().toISOString()}); }
+      save();
     }
+    seedIfEmpty();
 
-    // Observe when each section is intersecting the viewport
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          // find the nav link that matches
-          const id = entry.target.id;
-          clearActive();
-          const activeLink = document.querySelectorAll(`.nav-link[href="#${id}"]`);
-          activeLink.forEach(a => a.classList.add('text-slate-900','font-semibold'));
-          // Also highlight top-level links in header if present (desktop)
-        }
-      });
-    }, {
-      root: null,
-      rootMargin: '-40% 0px -40% 0px', // trigger when section near center
-      threshold: 0
-    });
+    function loadState(){ try{const raw=localStorage.getItem(KEY);return raw?JSON.parse(raw):JSON.parse(JSON.stringify(defaults));}catch(e){console.error(e);return JSON.parse(JSON.stringify(defaults));}}
+    function save(){localStorage.setItem(KEY,JSON.stringify(state));renderStats();}
+    function uid(){return 'id_'+Math.random().toString(36).slice(2,9)}
 
-    sections.forEach(s => observer.observe(s));
+    // --- Utility DOM helper ---
+    function $el(tag,props={},...children){const e=document.createElement(tag);for(const k in props){if(k.startsWith('on')) e.addEventListener(k.slice(2),props[k]); else if(k==='html') e.innerHTML=props[k]; else e.setAttribute(k,props[k]);} children.flat().forEach(c=>{if(typeof c==='string'||typeof c==='number') e.appendChild(document.createTextNode(c)); else if(c) e.appendChild(c)}); return e}
 
-    /* =========================
-       "Read more / Read less" toggles for services
-       Animated by changing max-height & classes; uses data attributes.
-       ========================= */
-    const toggleBtns = document.querySelectorAll('.toggle-btn');
-    toggleBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const targetId = btn.dataset.target;
-        const el = document.querySelector(`.collapsible[data-id="${targetId}"]`);
-        const isCollapsed = el.classList.contains('collapsed');
+    // --- Router ---
+    const content = document.getElementById('content');
+    document.getElementById('nav').addEventListener('click', (e)=>{ const b=e.target.closest('.navbtn'); if(!b) return; document.querySelectorAll('.navbtn').forEach(n=>n.classList.remove('active')); b.classList.add('active'); renderSection(b.dataset.target); });
+    document.getElementById('themeToggle').addEventListener('click', ()=>{ document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark'; });
 
-        if (isCollapsed) {
-          // Expand: measure content then set max-height to enable transition
-          el.classList.remove('collapsed');
-          // compute natural height
-          el.style.maxHeight = el.scrollHeight + 'px';
-          btn.textContent = 'Read less';
-          btn.setAttribute('aria-expanded','true');
-        } else {
-          // Collapse
-          el.style.maxHeight = '0px';
-          el.classList.add('collapsed');
-          btn.textContent = 'Read more';
-          btn.setAttribute('aria-expanded','false');
-        }
-      });
-    });
+    function renderSection(name='dashboard'){ content.innerHTML=''; if(name==='dashboard') renderDashboard(); if(name==='planner') renderPlanner(); if(name==='flights') renderFlights(); if(name==='fleet') renderFleet(); if(name==='assistant') renderAssistant(); }
 
-    // On window resize, clear explicit max-heights so measurement remains correct
-    window.addEventListener('resize', () => {
-      document.querySelectorAll('.collapsible').forEach(el => {
-        if (!el.classList.contains('collapsed')) {
-          el.style.maxHeight = el.scrollHeight + 'px';
-        }
-      });
-    });
-
-    /* =========================
-       Gallery modal (lightbox)
-       - Clicking a .gallery-item opens the modal and sets the image src
-       - Simple accessible close handlers included
-       ========================= */
-    const galleryItems = document.querySelectorAll('.gallery-item');
-    const lightbox = document.getElementById('lightbox');
-    const lightboxImg = document.getElementById('lightboxImg');
-    const lightboxClose = document.getElementById('lightboxClose');
-
-    function openLightbox(src, alt) {
-      lightboxImg.src = src;
-      lightboxImg.alt = alt || 'Gallery image';
-      lightbox.classList.remove('hidden');
-      lightbox.style.display = 'flex';
-      document.body.style.overflow = 'hidden'; // prevent background scroll
-      lightboxClose.focus();
+    // --- Dashboard ---
+    function renderDashboard(){
+      const recent = state.flights.slice(-6).reverse();
+      const container = $el('div',{}, $el('h2',{},'Dashboard'), $el('div',{class:'muted'},'Overview of SkyReach operations'),
+        $el('div',{style:'margin-top:14px;'}, $el('div',{class:'overview'},
+          $card('Total Flights',state.flights.length,'statFlights'), $card('Pilots',state.pilots.length,'statPilots'), $card('Fleet',state.fleet.length,'statFleet')
+        )),
+        $el('div',{style:'margin-top:18px'}, $el('h2',{},'Recent Flights')), $el('div',{class:'list',style:'margin-top:12px'}, ...recent.map(f=> flightRow(f)))
+      );
+      content.appendChild(container);
     }
+    function $card(title,value,id){ return $el('div',{class:'card'}, $el('div',{class:'big',id:id},value), $el('div',{class:'small'},title)); }
 
-    function closeLightbox() {
-      lightbox.classList.add('hidden');
-      lightbox.style.display = '';
-      lightboxImg.src = '';
-      document.body.style.overflow = '';
+    function flightRow(f){ const craft = state.fleet.find(x=>x.id===f.aircraftId) || {name:'N/A'}; const pilot = state.pilots.find(x=>x.id===f.pilotId) || {name:'Unassigned'}; const node = $el('div',{class:'list-item'}, $el('div',{class:'meta'}, $el('div',{class:'title'},`✈️ ${f.dep} → ${f.arr}`), $el('div',{class:'muted'},`${craft.name} • ${pilot.name} • ${f.block_mins} mins • ${new Date(f.date).toLocaleString()}`)), $el('div',{class:'actions'}, $el('button',{class:'btn ghost',onClick:()=>openFlightModal(f.id)},'View'), $el('button',{class:'btn ghost',onClick:()=>simulateFlight(f.id)},'Simulate'))); return node; }
+
+    // --- Planner ---
+    function renderPlanner(){ const selArt = state.fleet.map(a=>$el('option',{value:a.id},`${a.name} (${a.icao})`)); const selPilot = [ $el('option',{value:''},'Unassigned'), ...state.pilots.map(p=>$el('option',{value:p.id},p.name))];
+      const container = $el('div',{}, $el('h2',{},'Flight Planner'), $el('div',{class:'muted'},'Create flights quickly with accurate defaults'),
+        $el('div',{style:'margin-top:12px;display:grid;gap:10px'},
+          $label('Departure (ICAO)', $el('input',{class:'input',id:'dep',placeholder:'EGLL'})),
+          $label('Destination (ICAO)', $el('input',{class:'input',id:'arr',placeholder:'EGKK'})),
+          $el('div',{class:'row'}, $el('div',{}, $label('Aircraft', $el('select',{class:'input',id:'aircraft'}, ...selArt))), $el('div',{}, $label('Pilot', $el('select',{class:'input',id:'pilot'}, ...selPilot)))) ,
+          $el('div',{class:'row'}, $el('input',{class:'input',id:'block',placeholder:'Block time (mins)',type:'number'}), $el('input',{class:'input',id:'date',type:'datetime-local'})),
+          $el('div',{style:'display:flex;gap:10px'}, $el('button',{class:'btn',onClick:createFlight},'Create Flight'), $el('button',{class:'btn ghost',onClick:()=>{document.getElementById('dep').value='';document.getElementById('arr').value='';}} ,'Clear'))
+        )
+      );
+      content.appendChild(container);
     }
+    function $label(txt,field){ return $el('label',{}, $el('div',{},txt), field); }
 
-    galleryItems.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const src = btn.dataset.src;
-        const alt = btn.querySelector('img')?.alt || 'Gallery image';
-        openLightbox(src, alt);
-      });
-    });
+    function createFlight(){ const dep=document.getElementById('dep').value.trim().toUpperCase(); const arr=document.getElementById('arr').value.trim().toUpperCase(); const aircraftId=document.getElementById('aircraft')?.value || null; const pilotId=document.getElementById('pilot')?.value || null; const block=parseInt(document.getElementById('block')?.value)||60; const date=document.getElementById('date')?.value || new Date().toISOString(); if(!/^[A-Z]{3,4}$/.test(dep)||!/^[A-Z]{3,4}$/.test(arr)){ return showToast('Enter valid ICAO codes for departure and destination','error'); } const f={id:uid(),dep,arr,aircraftId,pilotId,block_mins:block,date,status:'Scheduled'}; state.flights.push(f); save(); renderSection('flights'); showToast('Flight created','success'); }
 
-    // Close handlers
-    lightboxClose.addEventListener('click', closeLightbox);
-    lightbox.addEventListener('click', (e) => {
-      if (e.target === lightbox) closeLightbox(); // click on backdrop
-    });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !lightbox.classList.contains('hidden')) closeLightbox();
-    });
+    // --- Flights page ---
+    function renderFlights(){ const container = $el('div',{}, $el('h2',{},'My Flights'), $el('div',{class:'muted'},'Manage your scheduled and completed flights'), $el('div',{style:'margin-top:12px'}, ...state.flights.map(f=> $el('div',{class:'list-item'}, $el('div',{class:'meta'}, $el('div',{class:'title'},`✈️ ${f.dep} → ${f.arr}`), $el('div',{class:'muted'},`Date: ${new Date(f.date).toLocaleString()} • ${f.block_mins} mins • Status: ${f.status}`)), $el('div',{class:'actions'}, $el('button',{class:'btn',onClick:()=>downloadFPL(f.id)},'Export FPL'), $el('button',{class:'btn ghost',onClick:()=>openFlightModal(f.id)},'Open'), $el('button',{class:'btn ghost',onClick:()=>simulateFlight(f.id)},'Simulate')))))); content.appendChild(container); }
 
-    /* =========================
-       Contact form client-side validation & simulated send
-       - Shows errors inline and displays success message on "send"
-       - No backend: simulates network latency and returns success
-       ========================= */
-    const contactForm = document.getElementById('contactForm');
-    const feedbackEl = document.getElementById('formFeedback');
-    const clearBtn = document.getElementById('clearForm');
+    function downloadFPL(id){ const f=state.flights.find(x=>x.id===id); if(!f) return showToast('Flight not found','error'); const craft=state.fleet.find(a=>a.id===f.aircraftId)||{name:'Unknown'}; const pilot=state.pilots.find(p=>p.id===f.pilotId)||{name:'Unassigned'}; const text = `SkyReach Virtual Airline\nFlight ID: ${f.id}\nPilot: ${pilot.name}\nAircraft: ${craft.name}\nDeparture: ${f.dep}\nArrival: ${f.arr}\nBlock Time: ${f.block_mins} mins\nScheduled: ${new Date(f.date).toISOString()}\n\nGenerated by SkyReach` ; const blob=new Blob([text],{type:'text/plain'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`fpl_${f.dep}_${f.arr}.txt`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); showToast('FPL exported','success'); }
 
-    function setFeedback(type, message) {
-      feedbackEl.classList.remove('hidden');
-      feedbackEl.textContent = message;
-      feedbackEl.className = '';
-      feedbackEl.classList.add('rounded', 'text-sm', 'p-3');
-      if (type === 'error') {
-        feedbackEl.classList.add('bg-red-50','text-red-700','border','border-red-100');
-      } else {
-        feedbackEl.classList.add('bg-green-50','text-green-800','border','border-green-100');
-      }
-    }
+    function simulateFlight(id){ const f=state.flights.find(x=>x.id===id); if(!f) return; f.status='Completed'; if(f.pilotId){ const p=state.pilots.find(x=>x.id===f.pilotId); if(p) p.hours = Math.round((p.hours + f.block_mins/60)*10)/10; } save(); renderSection('flights'); showToast('Flight simulated and completed','success'); }
 
-    contactForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      // simple validation
-      const name = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const message = document.getElementById('message').value.trim();
+    // --- Fleet ---
+    function renderFleet(){ const container = $el('div',{}, $el('h2',{},'Fleet Management'), $el('div',{class:'muted'},'Manage aircraft data and performance'), $el('div',{style:'margin-top:12px;display:flex;gap:10px'}, $el('button',{class:'btn',onClick:openAddAircraft},'Add Aircraft'), $el('button',{class:'btn ghost',onClick:()=>downloadJSON(state.fleet,'fleet')},'Export Fleet')) , $el('div',{style:'margin-top:12px'}, ...state.fleet.map(a=> $el('div',{class:'list-item'}, $el('div',{class:'aircraft'}, $el('div',{class:'plane'},a.icao), $el('div',{}, $el('div',{class:'title'},a.name), $el('div',{class:'muted'},`${a.range_nm} nm • ${a.cruise_kts} kts • ${a.capacity} pax`)))), $el('div',{class:'actions'}, $el('button',{class:'btn ghost',onClick:()=>openEditAircraft(a.id)},'Edit'), $el('button',{class:'btn ghost',onClick:()=>removeAircraft(a.id)},'Remove')))))); content.appendChild(container); }
 
-      if (!name || !email || !message) {
-        setFeedback('error', 'Please complete all fields before sending.');
-        return;
-      }
+    function openAddAircraft(){ openModal($el('div',{}, $el('h3',{},'Add Aircraft'), $el('div',{style:'display:grid;gap:8px;margin-top:8px'}, $label('Name', $el('input',{id:'ac_name',class:'input'})), $label('ICAO', $el('input',{id:'ac_icao',class:'input'})), $label('Range (nm)', $el('input',{id:'ac_range',class:'input',type:'number'})), $label('Cruise (kts)', $el('input',{id:'ac_cruise',class:'input',type:'number'})), $label('Capacity', $el('input',{id:'ac_pax',class:'input',type:'number'}))), $el('div',{style:'display:flex;gap:8px;margin-top:12px;justify-content:flex-end'}, $el('button',{class:'btn',onClick:()=>{ const name=document.getElementById('ac_name').value.trim(); const icao=document.getElementById('ac_icao').value.trim().toUpperCase(); const range=parseInt(document.getElementById('ac_range').value)||0; const cruise=parseInt(document.getElementById('ac_cruise').value)||0; const pax=parseInt(document.getElementById('ac_pax').value)||0; if(!name||!icao) return showToast('Name and ICAO required','error'); state.fleet.push({id:uid(),name,icao,range_nm:range,cruise_kts:cruise,capacity:pax}); save(); closeModal(); renderSection('fleet'); showToast('Aircraft added','success'); }},'Save'), $el('button',{class:'btn ghost',onClick:closeModal},'Cancel')) )); }
 
-      // basic email format check
-      if (!/^\S+@\S+\.\S+$/.test(email)) {
-        setFeedback('error', 'Please enter a valid email address.');
-        return;
-      }
+    function openEditAircraft(id){ const a = state.fleet.find(x=>x.id===id); if(!a) return; openModal($el('div',{}, $el('h3',{},'Edit Aircraft'), $el('div',{style:'display:grid;gap:8px;margin-top:8px'}, $label('Name', $el('input',{id:'ac_name',class:'input',value:a.name})), $label('ICAO', $el('input',{id:'ac_icao',class:'input',value:a.icao})), $label('Range (nm)', $el('input',{id:'ac_range',class:'input',type:'number',value:a.range_nm})), $label('Cruise (kts)', $el('input',{id:'ac_cruise',class:'input',type:'number',value:a.cruise_kts})), $label('Capacity', $el('input',{id:'ac_pax',class:'input',type:'number',value:a.capacity}))), $el('div',{style:'display:flex;gap:8px;margin-top:12px;justify-content:flex-end'}, $el('button',{class:'btn',onClick:()=>{ a.name=document.getElementById('ac_name').value.trim(); a.icao=document.getElementById('ac_icao').value.trim().toUpperCase(); a.range_nm=parseInt(document.getElementById('ac_range').value)||0; a.cruise_kts=parseInt(document.getElementById('ac_cruise').value)||0; a.capacity=parseInt(document.getElementById('ac_pax').value)||0; save(); closeModal(); renderSection('fleet'); showToast('Aircraft updated','success'); }},'Save'), $el('button',{class:'btn ghost',onClick:closeModal},'Cancel')) )); }
 
-      // simulate sending
-      setFeedback('info', 'Sending message...');
-      const submitButton = contactForm.querySelector('button[type="submit"]');
-      submitButton.disabled = true;
-      submitButton.style.opacity = '0.7';
+    function removeAircraft(id){ if(!confirm('Remove aircraft?')) return; state.fleet = state.fleet.filter(x=>x.id!==id); save(); renderSection('fleet'); showToast('Aircraft removed','success'); }
 
-      setTimeout(() => {
-        // success
-        setFeedback('success', 'Message sent! We will get back to you soon.');
-        contactForm.reset();
-        submitButton.disabled = false;
-        submitButton.style.opacity = '';
-      }, 900); // short simulated delay
-    });
+    // --- Assistant ---
+    function renderAssistant(){ const container = $el('div',{}, $el('h2',{},'AI Flight Assistant'), $el('div',{class:'muted'},'A smart, rule-based assistant to guide pilots'), $el('div',{id:'assistant',style:'margin-top:12px'}, $el('div',{id:'chat'}), $el('div',{id:'msgbox'}, $el('input',{id:'msg',class:'input',placeholder:'Ask about planning, FPL export, or VA rules'}), $el('button',{class:'btn',onClick:sendMsg},'Send')))); content.appendChild(container); renderAssistantWelcome(); }
 
-    clearBtn.addEventListener('click', () => {
-      contactForm.reset();
-      feedbackEl.classList.add('hidden');
-    });
+    function renderAssistantWelcome(){ const chat=document.getElementById('chat'); chat.innerHTML=''; chat.appendChild($el('div',{class:'bubble'},'SkyReach Assistant online — ask to \"Plan from EGCC to EGKK\" or \"Export FPL for [flight id]\".')) }
+    function sendMsg(){ const msg=document.getElementById('msg'); const txt=msg.value.trim(); if(!txt) return; appendBubble(txt,true); msg.value=''; setTimeout(()=>{ const reply=assistantReply(txt); appendBubble(reply,false); },400); }
+    function appendBubble(txt,isUser){ const chat=document.getElementById('chat'); const b=$el('div',{class:'bubble'+(isUser?' user':'' )},txt); chat.appendChild(b); chat.scrollTop = chat.scrollHeight; }
+    function assistantReply(msgRaw){ const msg=msgRaw.toLowerCase(); if(msg.includes('plan') && msg.includes('from')){ const parts=msg.match(/from\s+([a-z]{3,4})\s+to\s+([a-z]{3,4})/i); if(parts){ const dep=parts[1].toUpperCase(), arr=parts[2].toUpperCase(); return `Suggested plan: ${dep} → ${arr}. Open Flight Planner, enter ${dep} as departure and ${arr} as destination, choose aircraft and pilot, then Create Flight.` } return 'Tell me: Plan from [ICAO] to [ICAO].'; } if(msg.includes('export')||msg.includes('fpl')){ return 'To export: open My Flights, pick the flight and click Export FPL. You can also download the fleet/pilot JSON.' } if(msg.includes('simulate')){ return 'Use the My Flights page and press Simulate on a flight to mark it completed and credit pilot hours.' } if(msg.includes('help')){ return 'I can help with: planning flights, exporting flight plans, managing fleet, and simulating flights. Try: \"Plan from EGLL to EGKK\"' } return 'Sorry, I did not understand — try: \"Plan from EGCC to EGKK\" or \"Export FPL\".' }
 
-    /* =========================
-       Accessibility enhancements:
-       - ensure focus lands on newly opened modal close button (done)
-       - ensure focusable controls have visible focus rings (via .focus-ring)
-       ========================= */
+    // --- Modal utilities ---
+    function openModal(node){ const root=document.getElementById('modalRoot'); root.innerHTML=''; const backdrop=$el('div',{class:'modal-backdrop'}); const modal=$el('div',{class:'modal'}, node); backdrop.appendChild(modal); root.appendChild(backdrop); backdrop.addEventListener('click',(e)=>{ if(e.target===backdrop) closeModal(); }); }
+    function closeModal(){ document.getElementById('modalRoot').innerHTML=''; }
 
-    /* =========================
-       End of inline scripts
-       ========================= */
-  </script>
-</body>
+    // --- Flight modal ---
+    function openFlightModal(id){ const f=state.flights.find(x=>x.id===id); if(!f) return; const craft=state.fleet.find(x=>x.id===f.aircraftId)||{}; const pilot=state.pilots.find(x=>x.id===f.pilotId)||{}; const node = $el('div',{}, $el('h3',{},`Flight ${f.dep} → ${f.arr}`), $el('div',{style:'display:grid;gap:8px;margin-top:8px'}, $el('div',{}, $el('strong',{},'Aircraft: '), craft.name||'Unassigned'), $el('div',{}, $el('strong',{},'Pilot: '), pilot.name||'Unassigned'), $el('div',{}, $el('strong',{},'Block Time: '), `${f.block_mins} mins`), $el('div',{}, $el('strong',{},'Status: '), f.status), $el('div',{}, $el('strong',{},'Scheduled: '), new Date(f.date).toLocaleString())), $el('div',{style:'display:flex;gap:8px;margin-top:12px;justify-content:flex-end'}, $el('button',{class:'btn',onClick:()=>{ downloadFPL(f.id); }},'Export FPL'), $el('button',{class:'btn ghost',onClick:()=>{ simulateFlight(f.id); closeModal(); }},'Simulate'), $el('button',{class:'btn ghost',onClick:closeModal},'Close')));\n      openModal(node);\n    }\n\n    // --- Import/Export ---\n    function downloadJSON(obj,name){ const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`${name}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); showToast('Download started','success'); }\n\n    // --- Pilot management (simple) ---\n    // For brevity: add a few helpers exposed via quick commands\n    document.getElementById('invSave').addEventListener('click', ()=>{ downloadJSON(state,'skyreach_data'); });\n\n    // Quick new flight trigger\n    document.getElementById('quickNew').addEventListener('click', ()=>{ document.querySelectorAll('.navbtn').forEach(n=>n.classList.remove('active')); document.querySelector('[data-target=\"planner\"]').classList.add('active'); renderSection('planner'); window.scrollTo({top:0,behavior:'smooth'}); });\n    document.getElementById('exportAll').addEventListener('click', ()=>{ const all = state.flights.map(f=>{ const craft = state.fleet.find(a=>a.id===f.aircraftId)||{}; const pilot = state.pilots.find(p=>p.id===f.pilotId)||{}; return `Flight ${f.dep}→${f.arr}\\nPilot:${pilot.name}\\nAircraft:${craft.name}\\nDate:${new Date(f.date).toISOString()}\\n---\\n`; }).join('\\n'); const blob=new Blob([all],{type:'text/plain'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='skyreach_flights_export.txt'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); showToast('All flights exported','success'); });\n\n    document.getElementById('resetData').addEventListener('click', ()=>{ if(!confirm('Reset all local SkyReach data?')) return; state = JSON.parse(JSON.stringify(defaults)); save(); seedIfEmpty(); renderSection('dashboard'); showToast('Data reset','success'); });\n\n    // --- tiny UI helpers: toast ---\n    function showToast(msg,type='info'){ const t = $el('div',{style:`position:fixed;right:20px;bottom:20px;padding:10px 14px;border-radius:10px;background:${ type==='error' ? 'linear-gradient(90deg,#ff7a7a,#ffb3b3)' : 'linear-gradient(90deg,var(--accent),var(--gold))'};color:#021;box-shadow:0 8px 24px rgba(2,6,23,0.5);z-index:9999`},msg); document.body.appendChild(t); setTimeout(()=>t.style.opacity='0.0',2200); setTimeout(()=>t.remove(),3200); }\n\n    // ensure initial render\n    renderStats(); renderSection('dashboard');\n\n    // expose small API for debug\n    window.SkyReach = {state,save,uid};\n  </script>\n</body>
 </html>
